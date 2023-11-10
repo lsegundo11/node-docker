@@ -12,6 +12,7 @@ services:
       - NODE_ENV=development
       - MONGO_USER=luisf
       - MONGO_PASSWORD=mypassword
+      - MONGO_DB=mydb
     command: npm run dev
 
   mongo:

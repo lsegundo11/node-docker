@@ -13,9 +13,12 @@ services:
     image: mongodb/mongodb-community-server
     environment:
       MONGO_INITDB_ROOT_USERNAME: luisf
-      MONGO_INITDB_ROOT_PASSWORD: mypassword    
+      MONGO_INITDB_ROOT_PASSWORD: mypassword
     volumes:
       - mongo-db:/data/db
+
+  redis:
+    image: redis
 
 volumes:
   mongo-db:
