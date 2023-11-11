@@ -1,16 +1,30 @@
-// this is a tset
 const express = require("express");
 const mongoose = require("mongoose");
-const redis = require("redis");
+//redis requriements
+let RedisStore = require("connect-redis").default;
 const session = require("express-session");
-let RedisStore = require("connect-redis");
+const redis = require("redis");
 
 const {
   MONGO_USER,
   MONGO_PASSWORD,
   MONGO_IP,
   MONGO_PORT,
+  REDIS_URL,
+  REDIS_PORT,
+  SESSION_SECRET,
 } = require("./config/config");
+
+//Initialized redis client
+let redisClient = redis.createClient({
+  url: `redis://${REDIS_URL}:${REDIS_PORT}`,
+});
+redisClient.connect().catch(console.error);
+
+//initialize redis store
+let redisStore = new RedisStore({
+  client: redisClient,
+});
 
 const postRouter = require("./routes/postRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -31,6 +45,20 @@ const connectWithRetry = () => {
 
 connectWithRetry();
 app.use(express.json());
+//app.set("trust proxy");
+app.use(
+  session({
+    store: redisStore,
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+      httpOnly: true,
+      maxAge: 30000,
+    },
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("<h2>Hi there</h2>");
